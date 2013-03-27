@@ -481,7 +481,7 @@ void PIOS_Board_Init(void) {
 
 	/* UART1 Port */
 	uint8_t hw_uart1;
-	HwKflyUart1Get(&hw_uart1);
+	HwKFlyUart1Get(&hw_uart1);
 	switch (hw_uart1) {
 	case HWKFLY_UART1_DISABLED:
 		break;
