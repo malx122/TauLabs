@@ -25,5 +25,5 @@ FW_DESC_SIZE        := 0x00000064
 EF_BANK_BASE        := 0x08000000  # Start of entire flash image (usually start of bootloader as well)
 EF_BANK_SIZE        := 0x00060000  # Size of the entire flash image (from bootloader until end of firmware)
 
-OSCILLATOR_FREQ     :=  16000000
+OSCILLATOR_FREQ     :=  12000000
 SYSCLK_FREQ         := 168000000
