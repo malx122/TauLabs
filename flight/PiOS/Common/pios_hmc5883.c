@@ -109,6 +109,25 @@ static int32_t PIOS_HMC5883_Validate(struct hmc5883_dev *dev)
  * @brief Initialize the HMC5883 magnetometer sensor.
  * @return none
  */
+ void panic2(int32_t code) {
+	while(1){
+		for (int32_t i = 0; i < code; i++) {
+			PIOS_WDG_Clear();
+			PIOS_LED_Toggle(PIOS_LED_ALARM);
+			PIOS_DELAY_WaitmS(200);
+			PIOS_WDG_Clear();
+			PIOS_LED_Toggle(PIOS_LED_ALARM);
+			PIOS_DELAY_WaitmS(200);
+		}
+		PIOS_WDG_Clear();
+		PIOS_DELAY_WaitmS(200);
+		PIOS_WDG_Clear();
+		PIOS_DELAY_WaitmS(200);
+		PIOS_WDG_Clear();
+		PIOS_DELAY_WaitmS(100);
+	}
+}
+
 int32_t PIOS_HMC5883_Init(uint32_t i2c_id, const struct pios_hmc5883_cfg *cfg)
 {
 	dev = (struct hmc5883_dev *) PIOS_HMC5883_alloc();
@@ -208,9 +227,13 @@ static int32_t PIOS_HMC5883_Config(const struct pios_hmc5883_cfg * cfg)
 	CTRLB |= (uint8_t) (cfg->Gain);
 	MODE |= (uint8_t) (cfg->Mode);
 	
+	if (PIOS_I2C_CheckClear(dev->i2c_id) != 0)
+		panic2(5);
+		
 	// CRTL_REGA
 	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_A, CTRLA) != 0)
 		return -1;
+	
 	
 	// CRTL_REGB
 	if (PIOS_HMC5883_Write(PIOS_HMC5883_CONFIG_REG_B, CTRLB) != 0)

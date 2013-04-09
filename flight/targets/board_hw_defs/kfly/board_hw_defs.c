@@ -392,7 +392,7 @@ static const struct pios_i2c_adapter_cfg pios_i2c_internal_adapter_cfg = {
 	.pin_source = GPIO_PinSource10,
   },
   .sda = {
-    .gpio = GPIOC,
+    .gpio = GPIOB,
     .init = {
 			.GPIO_Pin = GPIO_Pin_11,
             .GPIO_Mode  = GPIO_Mode_AF,
@@ -455,9 +455,9 @@ static const struct flashfs_logfs_cfg flashfs_mx25_cfg = {
 };
 
 static const struct pios_flash_jedec_cfg flash_mx25_cfg = {
-	.expect_manufacturer = JEDEC_MANUFACTURER_MACRONIX,
-	.expect_memorytype   = 0x20,
-	.expect_capacity     = 0x16,
+	.expect_manufacturer = JEDEC_MANUFACTURER_WINBOND,
+	.expect_memorytype   = 0x40,
+	.expect_capacity     = 0x13,
 	.sector_erase        = 0x20,
 	.chip_erase          = 0x60,
 };

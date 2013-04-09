@@ -77,7 +77,9 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
 };
 
 static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
+#if defined(PIOS_HMC5883_HAS_GPIOS)
 	.exti_cfg = &pios_exti_hmc5883_cfg,
+#endif /* PIOS_HMC5883_HAS_GPIOS */
 	.M_ODR = PIOS_HMC5883_ODR_75,
 	.Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
 	.Gain = PIOS_HMC5883_GAIN_1_9,
@@ -297,9 +299,6 @@ void PIOS_Board_Init(void) {
 	if (PIOS_SPI_Init(&pios_spi_flash_id, &pios_spi_flash_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	if (PIOS_SPI_Init(&pios_spi_gyro_accel_id, &pios_spi_gyro_accel_cfg)) {
-		PIOS_Assert(0);
-	}
 #endif
 
 #if defined(PIOS_INCLUDE_FLASH)
@@ -386,7 +385,6 @@ void PIOS_Board_Init(void) {
 
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, PIOS_BOARD_HW_DEFS_GetUsbCfg(bdinfo->board_rev));
-
 #if defined(PIOS_INCLUDE_USB_CDC)
 
 	uint8_t hw_usb_vcpport;
@@ -884,54 +882,13 @@ void PIOS_Board_Init(void) {
 	PIOS_DELAY_WaitmS(200);
 	PIOS_WDG_Clear();
 
-#if defined(PIOS_INCLUDE_MPU6000)
-	if (PIOS_MPU6000_Init(pios_spi_gyro_accel_id, 0, &pios_mpu6000_cfg) != 0)
-		panic(2);
-	if (PIOS_MPU6000_Test() != 0)
-		panic(2);
-
-	// To be safe map from UAVO enum to driver enum
-	uint8_t hw_gyro_range;
-	HwKFlyGyroRangeGet(&hw_gyro_range);
-	switch(hw_gyro_range) {
-		case HWKFLY_GYRORANGE_250:
-			PIOS_MPU6000_SetGyroRange(PIOS_MPU60X0_SCALE_250_DEG);
-			break;
-		case HWKFLY_GYRORANGE_500:
-			PIOS_MPU6000_SetGyroRange(PIOS_MPU60X0_SCALE_500_DEG);
-			break;
-		case HWKFLY_GYRORANGE_1000:
-			PIOS_MPU6000_SetGyroRange(PIOS_MPU60X0_SCALE_1000_DEG);
-			break;
-		case HWKFLY_GYRORANGE_2000:
-			PIOS_MPU6000_SetGyroRange(PIOS_MPU60X0_SCALE_2000_DEG);
-			break;
-	}
-
-	uint8_t hw_accel_range;
-	HwKFlyAccelRangeGet(&hw_accel_range);
-	switch(hw_accel_range) {
-		case HWKFLY_ACCELRANGE_2G:
-			PIOS_MPU6000_SetAccelRange(PIOS_MPU60X0_ACCEL_2G);
-			break;
-		case HWKFLY_ACCELRANGE_4G:
-			PIOS_MPU6000_SetAccelRange(PIOS_MPU60X0_ACCEL_4G);
-			break;
-		case HWKFLY_ACCELRANGE_8G:
-			PIOS_MPU6000_SetAccelRange(PIOS_MPU60X0_ACCEL_8G);
-			break;
-		case HWKFLY_ACCELRANGE_16G:
-			PIOS_MPU6000_SetAccelRange(PIOS_MPU60X0_ACCEL_16G);
-			break;
-	}
-#endif
-
 #if defined(PIOS_INCLUDE_I2C)
 #if defined(PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(PIOS_I2C_MAIN_ADAPTER, &pios_hmc5883_cfg);
 	if (PIOS_HMC5883_Test() != 0)
 		panic(3);
 #endif
+
 
 	//I2C is slow, sensor init as well, reset watchdog to prevent reset here
 	PIOS_WDG_Clear();
@@ -957,7 +914,7 @@ void PIOS_Board_Init(void) {
 #endif
 
 	//Set adc input to floating as long as it is unused
-	GPIO_InitTypeDef GPIO_InitStructure;
+/*	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
@@ -973,7 +930,7 @@ void PIOS_Board_Init(void) {
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	GPIO_ResetBits(GPIOA, GPIO_Pin_4);
+	GPIO_ResetBits(GPIOA, GPIO_Pin_4);*/
 
 	/* Make sure we have at least one telemetry link configured or else fail initialization */
 	PIOS_Assert(pios_com_telem_rf_id || pios_com_telem_usb_id);
